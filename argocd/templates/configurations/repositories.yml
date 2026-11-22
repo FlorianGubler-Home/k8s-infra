@@ -4,8 +4,7 @@ kind: SealedSecret
 metadata:
   annotations:
     sealedsecrets.bitnami.com/namespace-wide: "true"
-  creationTimestamp: null
-  name: lithium-repository
+  name: flo-home-repository
   namespace: argocd
 spec:
   encryptedData:
@@ -19,5 +18,5 @@ spec:
       creationTimestamp: null
       labels:
         argocd.argoproj.io/secret-type: repository
-      name: lithium-repository
+      name: flo-home-repository
       namespace: argocd

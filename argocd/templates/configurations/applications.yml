@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: lithium-cloudflare
+  name: flo-home-cloudflare
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: git@github.com:FlorianGubler/lithium
+    repoURL: git@github.com:FlorianGubler-Home/k8s-infra
     targetRevision: HEAD
     path: cicd/cloudflare/
   destination:
@@ -20,12 +20,12 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: lithium-prometheus
+  name: flo-home-prometheus
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: git@github.com:FlorianGubler/lithium
+    repoURL: git@github.com:FlorianGubler-Home/k8s-infra
     targetRevision: HEAD
     path: cicd/prometheus/
   destination:
@@ -41,12 +41,12 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: lithium-grafana
+  name: flo-home-grafana
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: git@github.com:FlorianGubler/lithium
+    repoURL: git@github.com:FlorianGubler-Home/k8s-infra
     targetRevision: HEAD
     path: cicd/grafana/
   destination:
@@ -60,7 +60,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: lithium-floriangubler-ch-prod
+  name: flo-home-floriangubler-ch-prod
   namespace: argocd
 spec:
   project: default
