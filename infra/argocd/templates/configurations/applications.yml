@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: git@github.com:FlorianGubler-Home/k8s-infra
     targetRevision: HEAD
-    path: cicd/cloudflare/
+    path: infra/cloudflare/
   destination:
     server: https://kubernetes.default.svc
     namespace: cloudflare
@@ -27,7 +27,7 @@ spec:
   source:
     repoURL: git@github.com:FlorianGubler-Home/k8s-infra
     targetRevision: HEAD
-    path: cicd/prometheus/
+    path: infra/prometheus/
   destination:
     server: https://kubernetes.default.svc
     namespace: prometheus
@@ -48,7 +48,7 @@ spec:
   source:
     repoURL: git@github.com:FlorianGubler-Home/k8s-infra
     targetRevision: HEAD
-    path: cicd/grafana/
+    path: infra/grafana/
   destination:
     server: https://kubernetes.default.svc
     namespace: grafana
