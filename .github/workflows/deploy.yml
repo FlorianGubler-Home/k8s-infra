@@ -58,9 +58,9 @@ jobs:
         ENVIRONMENT=${{ github.event.inputs.environment }}
         
         if [[ "$CHART_NAME" == "*" ]]; then
-          CHART_PATHS=$(find ./cicd -mindepth 1 -maxdepth 1 -type d)
+          CHART_PATHS=$(find ./infra -mindepth 1 -maxdepth 1 -type d)
         else
-          CHART_PATHS="./cicd/$CHART_NAME"
+          CHART_PATHS="./infra/$CHART_NAME"
         fi
 
         for path in $CHART_PATHS; do
