@@ -48,9 +48,6 @@ jobs:
 
     - name: Build Helm chart dependencies
       run: |
-        helm repo add metallb https://metallb.github.io/metallb
-        helm repo update metallb
-
         for chart in ./infra/*/Chart.yaml; do
           chart_dir="${chart%/Chart.yaml}"
           if grep -q '^dependencies:' "$chart"; then
@@ -79,17 +76,11 @@ jobs:
             helm_args+=(--values "$path/values/$ENVIRONMENT.yaml")
           fi
 
-          local namespace_args=()
-          if [[ "$(basename "$path")" == "metallb" ]]; then
-            namespace_args+=(--namespace metallb-system --create-namespace)
-          fi
-
           helm upgrade --install \
             --set revision=${{ steps.branch.outputs.revision }} \
             --wait \
             "$(basename "$path")" \
             "$path" \
-            "${namespace_args[@]}" \
             "${helm_args[@]}"
         }
 
@@ -130,14 +121,6 @@ jobs:
             kubectl wait \
               --for=condition=Established \
               crd/sealedsecrets.bitnami.com \
-              --timeout=120s
-          fi
-
-          if [[ "$path" == "./infra/metallb" ]]; then
-            kubectl wait \
-              --for=condition=Established \
-              crd/ipaddresspools.metallb.io \
-              crd/l2advertisements.metallb.io \
               --timeout=120s
           fi
         done
