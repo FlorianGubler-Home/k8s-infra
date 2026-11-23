@@ -48,6 +48,9 @@ jobs:
 
     - name: Build Helm chart dependencies
       run: |
+        helm repo add metallb https://metallb.github.io/metallb 2>/dev/null || true
+        helm repo update metallb
+
         for chart in ./infra/*/Chart.yaml; do
           chart_dir="${chart%/Chart.yaml}"
           if grep -q '^dependencies:' "$chart"; then
@@ -74,6 +77,23 @@ jobs:
             helm_args+=(--values "$path/values.yaml")
           elif [ -f "$path/values/$ENVIRONMENT.yaml" ]; then
             helm_args+=(--values "$path/values/$ENVIRONMENT.yaml")
+          fi
+
+          if [[ "$(basename "$path")" == "metallb" ]]; then
+            helm repo add metallb https://metallb.github.io/metallb 2>/dev/null || true
+            helm upgrade --install metallb-controller metallb/metallb \
+              --namespace metallb-system \
+              --create-namespace \
+              --wait
+
+            kubectl wait \
+              --for=condition=Established \
+              crd/ipaddresspools.metallb.io \
+              crd/l2advertisements.metallb.io \
+              --timeout=120s
+
+            helm_args+=(--set metallb.enabled=false)
+            helm_args+=(--namespace metallb-system)
           fi
 
           helm upgrade --install \
