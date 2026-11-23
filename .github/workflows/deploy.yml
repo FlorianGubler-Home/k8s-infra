@@ -45,6 +45,15 @@ jobs:
       run: |
         kubectl version --client
         helm version --short
+
+    - name: Build Helm chart dependencies
+      run: |
+        for chart in ./infra/*/Chart.yaml; do
+          chart_dir="${chart%/Chart.yaml}"
+          if grep -q '^dependencies:' "$chart"; then
+            helm dependency build "$chart_dir"
+          fi
+        done
     
     - name: Extract branch
       shell: bash
