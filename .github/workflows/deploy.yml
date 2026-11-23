@@ -80,7 +80,6 @@ jobs:
           # Deploy shared infrastructure in dependency order. Remaining charts are
           # appended alphabetically so newly added components are not omitted.
           CHART_PATHS=(
-            "./infra/calico"
             "./infra/metallb"
             "./infra/persistent-volumes"
             "./infra/sealed-secrets"
