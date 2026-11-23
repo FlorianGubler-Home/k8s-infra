@@ -16,7 +16,6 @@ on:
         type: choice
         options:
           - "*"
-          - calico
           - cert-manager
           - ci-access
           - cloudflare
