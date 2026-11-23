@@ -77,11 +77,29 @@ jobs:
         }
 
         if [[ "$CHART_NAME" == "*" ]]; then
-          CHART_PATHS=("./infra/sealed-secrets")
+          # Deploy shared infrastructure in dependency order. Remaining charts are
+          # appended alphabetically so newly added components are not omitted.
+          CHART_PATHS=(
+            "./infra/calico"
+            "./infra/metallb"
+            "./infra/persistent-volumes"
+            "./infra/sealed-secrets"
+            "./infra/cert-manager"
+            "./infra/traefik"
+            "./infra/prometheus"
+            "./infra/grafana"
+            "./infra/ci-access"
+            "./infra/cloudflare"
+            "./infra/production"
+            "./infra/argocd"
+          )
           while IFS= read -r path; do
-            if [[ "$path" != "./infra/sealed-secrets" ]]; then
-              CHART_PATHS+=("$path")
-            fi
+            for ordered_path in "${CHART_PATHS[@]}"; do
+              if [[ "$path" == "$ordered_path" ]]; then
+                continue 2
+              fi
+            done
+            CHART_PATHS+=("$path")
           done < <(find ./infra -mindepth 1 -maxdepth 1 -type d | sort)
         elif [[ "$CHART_NAME" == "sealed-secrets" ]]; then
           CHART_PATHS=("./infra/sealed-secrets")
