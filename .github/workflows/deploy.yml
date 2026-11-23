@@ -5,11 +5,10 @@ on:
       environment:
         description: 'Environment'
         required: true
-        default: "development"
         type: choice
         options:
-          - development
-          - production
+          - dev
+          - prod
       chart:
         description: 'Deploy Component'
         required: true
@@ -31,7 +30,7 @@ on:
 jobs:
   call-deploy:
     runs-on: 
-      group: ${{ format('home-{0}', github.event.inputs.environment) }}
+      group: ${{ format('{0}', github.event.inputs.environment) }}
       
     permissions:
       contents: read
