@@ -57,30 +57,45 @@ jobs:
         CHART_NAME=${{ github.event.inputs.chart }}
         ENVIRONMENT=${{ github.event.inputs.environment }}
         
-        if [[ "$CHART_NAME" == "*" ]]; then
-          CHART_PATHS=$(find ./infra -mindepth 1 -maxdepth 1 -type d)
-        else
-          CHART_PATHS="./infra/$CHART_NAME"
-        fi
-
-        for path in $CHART_PATHS; do
+        deploy_chart() {
+          local path="$1"
           echo "Deploying $path to $ENVIRONMENT"
-        
-          # Initialize the values file argument as empty
-          helm_args=""
 
-          # Direct values.yaml file exists in chart root
+          local helm_args=()
           if [ -f "$path/values.yaml" ]; then
-            helm_args="--values $path/values.yaml"
-          # Environment-specific values file exists in subfolder
+            helm_args+=(--values "$path/values.yaml")
           elif [ -f "$path/values/$ENVIRONMENT.yaml" ]; then
-            helm_args="--values $path/values/$ENVIRONMENT.yaml"
+            helm_args+=(--values "$path/values/$ENVIRONMENT.yaml")
           fi
-        
+
           helm upgrade --install \
             --set revision=${{ steps.branch.outputs.revision }} \
             --wait \
             "$(basename "$path")" \
             "$path" \
-            $helm_args
+            "${helm_args[@]}"
+        }
+
+        if [[ "$CHART_NAME" == "*" ]]; then
+          CHART_PATHS=("./infra/sealed-secrets")
+          while IFS= read -r path; do
+            if [[ "$path" != "./infra/sealed-secrets" ]]; then
+              CHART_PATHS+=("$path")
+            fi
+          done < <(find ./infra -mindepth 1 -maxdepth 1 -type d | sort)
+        elif [[ "$CHART_NAME" == "sealed-secrets" ]]; then
+          CHART_PATHS=("./infra/sealed-secrets")
+        else
+          CHART_PATHS=("./infra/sealed-secrets" "./infra/$CHART_NAME")
+        fi
+
+        for path in "${CHART_PATHS[@]}"; do
+          deploy_chart "$path"
+
+          if [[ "$path" == "./infra/sealed-secrets" ]]; then
+            kubectl wait \
+              --for=condition=Established \
+              crd/sealedsecrets.bitnami.com \
+              --timeout=120s
+          fi
         done
